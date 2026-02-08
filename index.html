@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>AI Image Factory</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+
+<link rel="manifest" href="manifest.json">
+
+<style>
+html,body{
+margin:0;
+padding:0;
+height:100%;
+overflow:hidden;
+background:#000;
+}
+
+iframe{
+border:0;
+width:100%;
+height:100%;
+}
+
+#installBtn{
+position:fixed;
+bottom:10px;
+left:50%;
+transform:translateX(-50%);
+padding:10px 20px;
+background:black;
+color:white;
+border:1px solid white;
+display:none;
+z-index:9999;
+}
+</style>
+</head>
+
+<body>
+
+<button id="installBtn">Install App</button>
+
+<iframe src="https://transparent-ai-image-forge.base44.app"></iframe>
+
+<script>
+if('serviceWorker' in navigator){
+navigator.serviceWorker.register('sw.js');
+}
+
+let deferredPrompt;
+const btn=document.getElementById("installBtn");
+
+window.addEventListener('beforeinstallprompt',e=>{
+e.preventDefault();
+deferredPrompt=e;
+btn.style.display="block";
+});
+
+btn.onclick=()=>{
+btn.style.display="none";
+deferredPrompt.prompt();
+};
+</script>
+
+</body>
+</html>
