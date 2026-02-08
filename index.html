@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+
 <meta charset="utf-8">
 <title>AI Image Factory</title>
 
@@ -16,6 +17,7 @@ padding:0;
 height:100%;
 overflow:hidden;
 background:#000;
+font-family:Arial, sans-serif;
 }
 
 iframe{
@@ -35,20 +37,49 @@ color:white;
 border:1px solid white;
 display:none;
 z-index:9999;
+border-radius:6px;
+}
+
+#toast{
+position:fixed;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+background:#111;
+color:white;
+padding:10px 20px;
+border-radius:6px;
+display:none;
+z-index:9999;
 }
 </style>
+
 </head>
 
 <body>
 
+<div id="toast">Copied</div>
+
 <button id="installBtn">Install App</button>
 
-<iframe src="https://transparent-ai-image-forge.base44.app"></iframe>
+<!-- iframe WITH clipboard permission -->
+<iframe
+src="https://transparent-ai-image-forge.base44.app"
+allow="clipboard-read; clipboard-write">
+</iframe>
 
 <script>
+
+/* =========================
+   SERVICE WORKER
+========================= */
 if('serviceWorker' in navigator){
 navigator.serviceWorker.register('sw.js');
 }
+
+/* =========================
+   PWA INSTALL BUTTON
+========================= */
 
 let deferredPrompt;
 const btn=document.getElementById("installBtn");
@@ -63,6 +94,63 @@ btn.onclick=()=>{
 btn.style.display="none";
 deferredPrompt.prompt();
 };
+
+/* =========================
+   UNIVERSAL COPY FUNCTION
+========================= */
+
+function copyText(text){
+
+if(navigator.clipboard && window.isSecureContext){
+
+navigator.clipboard.writeText(text).then(()=>{
+showToast();
+});
+
+}else{
+
+const textarea=document.createElement("textarea");
+textarea.value=text;
+textarea.style.position="fixed";
+textarea.style.opacity="0";
+
+document.body.appendChild(textarea);
+textarea.focus();
+textarea.select();
+
+document.execCommand("copy");
+document.body.removeChild(textarea);
+
+showToast();
+}
+
+}
+
+/* =========================
+   TOAST
+========================= */
+
+function showToast(){
+const toast=document.getElementById("toast");
+toast.style.display="block";
+
+setTimeout(()=>{
+toast.style.display="none";
+},1500);
+}
+
+/* =========================
+   RECEIVE COPY FROM IFRAME
+========================= */
+
+window.addEventListener("message",function(e){
+
+if(e.data.copy){
+copyText(e.data.copy);
+}
+
+});
+
 </script>
 
 </body>
